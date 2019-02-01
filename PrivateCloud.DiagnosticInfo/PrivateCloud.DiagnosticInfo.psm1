@@ -379,6 +379,7 @@ $CommonFuncBlock = {
 
     # function for constructing filter xpath queries for event channels
     # event: list of event ids
+    # provider: name of provider to filter to (for multi-provider logs, like system)
     # timebase: time base for timedelta query (default: current system time)
     # timedeltams: time in ms relatve to base to filter event timestamps to (older than base)
     # data: table of k=v the event(s) must match
@@ -392,6 +393,7 @@ $CommonFuncBlock = {
         [CmdletBinding(PositionalBinding=$false)]
         param (
             [int[]] $Event = @(),
+            [string] $Provider = $null,
 
             [datetime] $TimeBase,
 
@@ -414,6 +416,11 @@ $CommonFuncBlock = {
             } else {
                 $systemclauses += $c
             }
+        }
+
+        # filter to single provider if specified (i.e., for multi-provider logs like system log)
+        if ($Provider) {
+            $systemclauses += "Provider[@Name = '" + $Provider + "']"
         }
 
         # build the time delta clause
